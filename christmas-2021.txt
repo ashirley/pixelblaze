@@ -1,0 +1,132 @@
+function (pixelCount) {
+  
+  // https://github.com/scijs/newton-raphson-method
+  function newtonRaphson (f, fp, x0, options) {
+    var x1, y, yp, tol, maxIter, iter, yph, ymh, yp2h, ym2h, h, hr, verbose, eps;
+
+    // Iterpret variadic forms:
+    if (typeof fp !== 'function') {
+      options = x0;
+      x0 = fp;
+      fp = null;
+    }
+
+    options = options || {};
+    tol = options.tolerance === undefined ? 1e-7 : options.tolerance;
+    eps = options.epsilon === undefined ? 2.220446049250313e-16 : options.epsilon;
+    maxIter = options.maxIterations === undefined ? 20 : options.maxIterations;
+    h = options.h === undefined ? 1e-4 : options.h;
+    verbose = options.verbose === undefined ? false : options.verbose;
+    hr = 1 / h;
+
+    iter = 0;
+    while (iter++ < maxIter) {
+      // Compute the value of the function:
+      y = f(x0);
+
+      if (fp) {
+        yp = fp(x0);
+      } else {
+        // Needs numerical derivatives:
+        yph = f(x0 + h);
+        ymh = f(x0 - h);
+        yp2h = f(x0 + 2 * h);
+        ym2h = f(x0 - 2 * h);
+
+        yp = ((ym2h - yp2h) + 8 * (yph - ymh)) * hr / 12;
+      }
+
+      // Check for badly conditioned update (extremely small first deriv relative to function):
+      if (Math.abs(yp) <= eps * Math.abs(y)) {
+        if (verbose) {
+          console.log('Newton-Raphson: failed to converged due to nearly zero first derivative');
+        }
+        return false;
+      }
+
+      // Update the guess:
+      x1 = x0 - y / yp;
+
+      // Check for convergence:
+      if (Math.abs(x1 - x0) <= tol * Math.abs(x1)) {
+        if (verbose) {
+          console.log('Newton-Raphson: converged to x = ' + x1 + ' after ' + iter + ' iterations');
+        }
+        return x1;
+      }
+
+      // Transfer update to the new guess:
+      x0 = x1;
+    }
+
+    if (verbose) {
+      console.log('Newton-Raphson: Maximum iterations reached (' + maxIter + ')');
+    }
+
+    return false;
+  }
+
+
+  function findA(s, h, v) {
+    // Vary 'a' to find the root of the following equation
+    // https://stackoverflow.com/a/25759976/6950
+    toBeOptimised = (a) => (2*a*Math.sinh(h/(2*a)) - Math.sqrt((s**2) - (v**2))) ** 2;
+
+    return newtonRaphson(toBeOptimised, 5, {maxIterations: 100});
+  }
+
+  function createCurveMap(s, h, v, xOffset, yOffset, pixelCount) {
+    //first find 'a' for this curve
+    const a = findA(s, h, v);
+    const top = a * Math.cosh((0.5 * h) / a)
+    const map = [];
+    
+    for (var i = 0; i < pixelCount; i++) {
+      const x = xOffset + (i/(pixelCount-1)) * h;
+      const y = yOffset + top - a * Math.cosh(((i/(pixelCount-1) - 0.5) * h) / a)
+      map.push([x,y])
+    }
+    return map;
+  }
+
+  function createHorizontalMap(y, xStart, xEnd, pixelCount) {
+    const map = [];
+    for (var i =0; i < pixelCount; i++) {
+      const x = xStart + (i/(pixelCount-1)) * (xEnd - xStart)
+
+      map.push([x,y])
+    }
+    return map;
+  }
+
+
+  //return [[0,100], [201,0], [201,100]]
+  //  .concat(createCurveMap(101, 100, 0, 0, 0, 101))
+  //  .concat(createCurveMap(101, 100, 0, 101, 0, 101));
+  //return [[0,10], [21,0], [21,10]]
+  //  .concat(createCurveMap(101, 100, 0, 0, 0, 101))
+  //  .concat(createCurveMap(101, 100, 0, 101, 0, 101));
+  //
+  //function createCurveMap(s, h, v, xOffset, yOffset, pixelCount)
+  //
+  // 
+
+  //  straight from middle to left 46
+  //  6 curves left to right 18*6 ( 0, 15, 30, 45,     47, 62, 77, 92)
+  //  straight from right to middle 46
+  return []
+    .concat(createCurveMap(18, 15, 0, 0, 0, 18))
+    .concat(createCurveMap(18, 15, 0, 15, 0, 18))
+    .concat(createCurveMap(18, 15, 0, 30, 0, 18))
+    .concat(createHorizontalMap(0, 45, 0, 46))
+    //.concat(createCurveMap(18, 15, 0, 47, 0, 18))
+    //.concat(createCurveMap(18, 15, 0, 62, 0, 18))
+    //.concat(createCurveMap(18, 15, 0, 77, 0, 18))
+    //.concat(createHorizontalMap(0, 91, 46, 46))
+    .concat(createCurveMap(18, 15, 0, 0, 5, 18))
+    .concat(createCurveMap(18, 15, 0, 15, 5, 18))
+    .concat(createCurveMap(18, 15, 0, 30, 5, 18))
+    .concat(createHorizontalMap(5, 45, 0, 46))
+  
+    //.concat([[100,100]])
+}

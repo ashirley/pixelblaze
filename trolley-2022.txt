@@ -1,0 +1,218 @@
+function (pixelCount) {
+  
+  function interpolate(start, end, i, count) {
+    return start + (i/(count-1)) * (end - start);
+  }
+  
+  function interpolateE(start, end, i, count) {
+    return interpolate(start, end, i+1, count+2);
+  }
+  
+  function createHorizontalMap(xStart, xEnd, y, z, pixelCount) {
+    const map = [];
+    for (var i =0; i < pixelCount; i++) {
+      const x = interpolate(xStart, xEnd, i, pixelCount);
+
+      map.push([x,y,z])
+    }
+    return map;
+  }
+
+  function createYMap(x, yStart, yEnd, z, pixelCount) {
+    const map = [];
+    for (var i =0; i < pixelCount; i++) {
+      const y = interpolate(yStart, yEnd, i, pixelCount);
+
+      map.push([x,y,z])
+    }
+    return map;
+  }
+
+  function createVerticalMapE(x, yStart, yEnd, zStart, zEnd, pixelCount) {
+    const map = [];
+    for (var i =0; i < pixelCount; i++) {
+      const y = interpolateE(yStart, yEnd, i, pixelCount)
+      const z = interpolateE(zStart, zEnd, i, pixelCount)
+
+      map.push([x,y,z])
+    }
+    return map;
+  }
+
+
+
+
+
+  btm_x_1 = 0.31; // 0.31 / 14 LEDs
+  btm_x_1_count = 14
+  btm_x_2 = 0.72; // + 0.41 / 10 LEDs (0.28 / 16 LEDs remaining)
+  btm_x_2_count = 10;
+  btm_x_3 = 1;
+  btm_x_3_count = 16;
+
+  btm_z_1 = -0;
+  btm_z_2 = -0.2;
+  btm_z_count = 14;
+  btm_y_1 = 0.45;
+  btm_y_2 = 0.32;
+  btm_y_3 = 0.18;
+  btm_y_4 = 0.05;
+
+  wall_x_1 = 1;
+  wall_x_2 = 0;
+  wall_y = 0;
+  wall_z_1 = 0;
+  wall_z_2 = 0.1;
+  wall_z_3 = 0.2;
+  wall_count_1 = 14;
+  wall_count_2 = 15;
+  wall_count_3 = 15; //+ 3 up + 3 across
+  
+  wall2_y = 0.5;
+  wall2_count_1 = 14;
+  wall2_count_2 = 15;
+  wall2_count_3 = 14; //+ 3 up + 3 across
+  
+  /*
+  roof_x_1 = 1;
+  roof_x_2 = 0;
+  roof_y_1 = 0.0625;
+  roof_y_2 = 0.1250;
+  roof_y_3 = 0.1875;
+  roof_y_4 = 0.2500;
+  roof_y_5 = 0.3125;
+  roof_y_6 = 0.3750;
+  roof_y_7 = 0.4375;
+  roof_y_8 = 0.50;
+  roof_z_1 = 0.30;
+  roof_z_2 = 0.45;
+  roof_z_3 = 0.60;
+  roof_z_4 = 0.75;
+  roof_count_1 = 11;
+  roof_count_2 = 13;
+  roof_count_3 = 14;
+  roof_count_4 = 12; //top
+  roof_count_5 = 12;
+  roof_count_6 = 14;
+  roof_count_7 = 13;
+  roof_count_8 = 12;
+  
+  */
+  
+  roof_x_1 = 1;
+  roof_x_2 = 0.1;
+  roof_y_1 = 0.;
+  roof_y_2 = 0;
+  roof_y_3 = 0;
+  roof_y_4 = 0;
+  roof_y_5 = 0.15;
+  roof_y_6 = 0.35;
+  roof_y_7 = 0.5;
+  roof_y_8 = 0.5;
+  roof_y_9 = 0.5;
+  roof_y_10 = 0.5;
+  roof_z_1 = 0.30; //TODO
+  roof_z_2 = 0.45; //TODO
+  roof_z_3 = 0.60; //TODO
+  roof_z_4 = 0.75; //TODO
+  roof_z_5 = 0.9; //TODO
+  roof_count_1 = 8;
+  roof_count_2 = 10;
+  roof_count_3 = 10;
+  roof_count_4 = 11;
+  roof_count_5 = 11; //top
+  roof_count_6 = 11;
+  roof_count_7 = 11;
+  roof_count_8 = 10;
+  roof_count_9 = 11;
+  roof_count_10 = 8;
+  
+  output = []
+  .concat(createHorizontalMap(0, btm_x_1, btm_y_1, btm_z_1, btm_x_1_count))
+  .concat(createVerticalMapE(btm_x_1, btm_y_1, btm_y_1, btm_z_1,  btm_z_2, btm_z_count))
+  .concat(createHorizontalMap(btm_x_1, btm_x_2, btm_y_1, btm_z_2, btm_x_2_count))
+  .concat(createVerticalMapE(btm_x_2, btm_y_1, btm_y_1, btm_z_2, btm_z_1, btm_z_count)) 
+  .concat(createHorizontalMap(btm_x_2, btm_x_3, btm_y_1, btm_z_1, btm_x_3_count))
+  
+  .concat(createYMap(1, btm_y_1, btm_y_2, btm_z_1, 9)) //NB. the overlap here is intentional
+
+  .concat(createHorizontalMap(1, btm_x_2, btm_y_2, btm_z_1, btm_x_3_count))
+  .concat(createVerticalMapE(btm_x_2, btm_y_2, btm_y_2, btm_z_1, btm_z_2, btm_z_count)) 
+  .concat(createHorizontalMap(btm_x_2, btm_x_1, btm_y_2, btm_z_2, btm_x_2_count))
+  .concat(createVerticalMapE(btm_x_1, btm_y_2, btm_y_2, btm_z_2,  btm_z_1, btm_z_count))
+  .concat(createHorizontalMap(btm_x_1, 0, btm_y_2, btm_z_1, btm_x_1_count))
+
+  .concat(createYMap(0, btm_y_2, btm_y_3, btm_z_1, 8)) //NB. the overlap here is intentional
+
+  .concat(createHorizontalMap(0, btm_x_1, btm_y_3, btm_z_1, btm_x_1_count))
+  .concat(createVerticalMapE(btm_x_1, btm_y_3, btm_y_3, btm_z_1,  btm_z_2, btm_z_count))
+  .concat(createHorizontalMap(btm_x_1, btm_x_2, btm_y_3, btm_z_2, btm_x_2_count))
+  .concat(createVerticalMapE(btm_x_2, btm_y_3, btm_y_3, btm_z_2, btm_z_1, btm_z_count)) 
+  .concat(createHorizontalMap(btm_x_2, 1, btm_y_3, btm_z_1, btm_x_3_count))
+  
+  .concat(createYMap(1, btm_y_3, btm_y_4, btm_z_1, 9)) //NB. the overlap here is intentional
+
+  .concat(createHorizontalMap(1, btm_x_2, btm_y_4, btm_z_1, btm_x_3_count))
+  .concat(createVerticalMapE(btm_x_2, btm_y_4, btm_y_4, btm_z_1, btm_z_2, btm_z_count)) 
+  .concat(createHorizontalMap(btm_x_2, btm_x_1, btm_y_4, btm_z_2, btm_x_2_count))
+  .concat(createVerticalMapE(btm_x_1, btm_y_4, btm_y_4, btm_z_2,  btm_z_1, btm_z_count))
+  .concat(createHorizontalMap(btm_x_1, 0, btm_y_4, btm_z_1, btm_x_1_count))
+
+// wall
+  .concat(createHorizontalMap(wall_x_2, wall_x_1, wall_y, wall_z_1, wall_count_1))
+  .concat(createHorizontalMap(wall_x_1, wall_x_2, wall_y, wall_z_2, wall_count_2))
+  .concat(createHorizontalMap(wall_x_2, wall_x_1, wall_y, wall_z_3, wall_count_3))
+
+
+// roof
+/*
+  .concat(createVerticalMapE(roof_x_1, wall_y,  roof_y_1, wall_z_3, roof_z_1, 3))
+  .concat(createHorizontalMap(roof_x_1, roof_x_2, roof_y_1, roof_z_1, roof_count_1))
+  .concat(createVerticalMapE(roof_x_2, roof_y_1, roof_y_2, roof_z_1, roof_z_2, 1))
+  .concat(createHorizontalMap(roof_x_2, roof_x_1, roof_y_2, roof_z_2, roof_count_2))
+  .concat(createVerticalMapE(roof_x_1, roof_y_2, roof_y_3, roof_z_2, roof_z_3, 1))
+  .concat(createHorizontalMap(roof_x_1, roof_x_2, roof_y_3, roof_z_3, roof_count_3))
+  .concat(createVerticalMapE(roof_x_2, roof_y_3, roof_y_4, roof_z_3, roof_z_4, 1))
+  .concat(createHorizontalMap(roof_x_2, roof_x_1, roof_y_4, roof_z_4, roof_count_4))
+  .concat(createHorizontalMap(roof_x_1, roof_x_2, roof_y_5, roof_z_4, roof_count_5))
+  .concat(createVerticalMapE(roof_x_2, roof_y_5, roof_y_6, roof_z_4, roof_z_3, 1))
+  .concat(createHorizontalMap(roof_x_2, roof_x_1, roof_y_6, roof_z_3, roof_count_6))
+  .concat(createVerticalMapE(roof_x_1, roof_y_6, roof_y_7, roof_z_3, roof_z_2, 1))
+  .concat(createHorizontalMap(roof_x_1, roof_x_2, roof_y_7, roof_z_2, roof_count_7))
+  .concat(createVerticalMapE(roof_x_2, roof_y_7, roof_y_8, roof_z_2, roof_z_1, 1))
+  .concat(createHorizontalMap(roof_x_2, roof_x_1, roof_y_8, roof_z_1, roof_count_8))
+  .concat(createVerticalMapE(roof_x_1, roof_y_8, wall2_y, roof_z_1, wall_z_3, 3))
+*/
+  .concat(createVerticalMapE(roof_x_1, wall_y,  roof_y_1, wall_z_3, roof_z_1, 1)) //-2
+  .concat(createHorizontalMap(roof_x_1, roof_x_2, roof_y_1, roof_z_1, roof_count_1)) //-4
+  .concat(createVerticalMapE(roof_x_2, roof_y_1, roof_y_2, roof_z_1, roof_z_2, 1)) //-4
+  .concat(createHorizontalMap(roof_x_2, roof_x_1, roof_y_2, roof_z_2, roof_count_2)) //-7
+  .concat(createVerticalMapE(roof_x_1, roof_y_2, roof_y_3, roof_z_2, roof_z_3, 1)) //-7
+  .concat(createHorizontalMap(roof_x_1, roof_x_2, roof_y_3, roof_z_3, roof_count_3)) //-11
+  .concat(createVerticalMapE(roof_x_2, roof_y_3, roof_y_4, roof_z_3, roof_z_4, 1))
+  .concat(createHorizontalMap(roof_x_2, roof_x_1, roof_y_4, roof_z_4, roof_count_4)) //-12
+  .concat(createVerticalMapE(roof_x_1, roof_y_4, roof_y_5, roof_z_4, roof_z_5, 1)) //-11
+  .concat(createHorizontalMap(roof_x_1, roof_x_2, roof_y_5, roof_z_5, roof_count_5)) // 0
+  .concat(createHorizontalMap(roof_x_2, roof_x_1, roof_y_6, roof_z_5, roof_count_6)) //+11
+  .concat(createVerticalMapE(roof_x_1, roof_y_6, roof_y_7, roof_z_5, roof_z_4, 1)) //+12
+  .concat(createHorizontalMap(roof_x_1, roof_x_2, roof_y_7, roof_z_4, roof_count_7)) //+11
+  .concat(createVerticalMapE(roof_x_2, roof_y_7, roof_y_8, roof_z_4, roof_z_3, 1))
+  .concat(createHorizontalMap(roof_x_2, roof_x_1, roof_y_8, roof_z_3, roof_count_8))//+7
+  .concat(createVerticalMapE(roof_x_1, roof_y_8, roof_y_9, roof_z_3, roof_z_2, 1))
+  .concat(createHorizontalMap(roof_x_1, roof_x_2, roof_y_9, roof_z_2, roof_count_9)) //+5
+  .concat(createVerticalMapE(roof_x_2, roof_y_9, roof_y_10, roof_z_2, roof_z_1, 1))
+  .concat(createHorizontalMap(roof_x_2, roof_x_1, roof_y_10, roof_z_1, roof_count_10)) //+3
+  .concat(createVerticalMapE(roof_x_1, roof_y_10, wall2_y, roof_z_1, wall_z_3, 3))
+
+
+// wall2
+  .concat(createHorizontalMap(wall_x_1, wall_x_2, wall2_y, wall_z_3, wall2_count_3))
+  .concat(createHorizontalMap(wall_x_2, wall_x_1, wall2_y, wall_z_2, wall2_count_2))
+  .concat(createHorizontalMap(wall_x_1, wall_x_2, wall2_y, wall_z_1, wall2_count_1))
+
+
+  // .concat([[0,0,0], [0,0,1], [0,1,0], [1,0,0], [0,1,1], [1,1,0], [1,0,1], [1,1,1]])
+  
+  console.log(output.length) //, JSON.stringify(output))
+  return output
+}

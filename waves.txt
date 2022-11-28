@@ -1,0 +1,136 @@
+speed = 1
+
+h0 = 0
+s0 = 0
+v0 = 0
+h1 = 0
+s1 = 0
+v1 = 0
+hdiff = 0
+
+export var t2;
+export var v;
+
+export function hsvPickerPrimaryColor(h, s, v){
+  h0 = h;
+  s0 = s;
+  v0 = v
+}
+
+export function hsvPickerSecondaryColor(h, s, v){
+  h1 = h;
+  s1 = s;
+  v1 = v
+}
+
+export function sliderWaveEdgeIntensity(v) {
+  waveEdgeIntensity = v
+}
+
+
+
+function sigmoid(x) {
+  return 0.5+0.3*atan(10*(2*x-1))
+}
+
+export function beforeRender(delta) {
+  t1 = time(.02 / speed)    // x offset
+  t2 = pow(wave(time(.3 / speed)), 5) + 1   // wave height offset
+  t3 = 0.5 - wave(time(.085 / speed))  // total height offset
+
+  // Oscillate the scale coefficient of space between 0.25 and 0.75
+  // scale = (.5 + wave(time(.1))) / 2
+  
+  hdiff=h1-h0 % 1
+}
+
+export function render3D(index, x, y, z) {
+  // Color is 20% dependent on each axis and cycling every 6.5 seconds
+  // h = x / 5 + y / 5 + z / 5 + t1
+  
+  // Since wave() returns a 0..1 sinusoid, and we multiply it by other 
+  // phase-offset wave()s, the final output will be a series of spheres in space
+  // with a value of 0..10
+  // v = 10 * (wave(x * scale + wave(t1)) * 
+  //           wave(y * scale + wave(t2)) * 
+  //           wave(z * scale + wave(t3)))
+            
+  // The outer surface of the spheres, with the lowest values, will be white. v
+  // values between 2 and 10 (the core of the spheres) will be colorful.
+  // s = v - 1
+
+  /*
+    This looks like typical gamma correction here, but really it only serves to
+    increase the negative space between nearby spheres; after this the cores
+    will all have v > 1 (e.g. center v == 10^3)
+  */
+  // v = v * v * v  
+  waveHeight = sigmoid(z + (0.4 * (0.5 - wave(t1 + x)) * t2) + (0.5 * t3))
+  waveEdge = pow((0.5-waveHeight), 2) * 7*waveEdgeIntensity
+  h = h0 + hdiff*waveHeight;
+  s = s0;
+  v = v0 - waveEdge;
+  
+  
+  myhsv(index, h, s, v) // Recall that v is automatically capped at 1.0 by hsv()
+}
+
+// As we commonly do with 3D fields, a decent 2D rendering is a slice at z == 0
+export function render2D(index, x, y) {
+  render3D(index, x, 0, y)
+}
+
+/*
+  A common approach to creating 1D versions of 3D patterns is to render the line
+  in 3D where y & z = 0. To translate pixel indices to x's 0..1 world 
+  coordinates, divide index by pixelCount to output a 'percent this pixel is into
+  the strip', i.e. 0..1. Evaluating this aesthetically in 1D, it seems to look
+  best scaled out so we multiply by 8 to plot a longer line from 3D space.
+*/
+export function render(index) {
+  render3D(index, 0, 0, index / pixelCount * 8,)
+}
+
+
+var r, g, b
+function hsv2rgb(hh, ss, vv) {
+    var h = hh % 1
+    var s = clamp(ss, 0, 1) 
+    var v = clamp(vv, 0, 1) 
+    var i = floor(h * 6)
+    var f = h * 6 - i
+    var p = v * (1 - s)
+    var q = v * (1 - (s * f))
+    var t = v * (1 - (s * (1 - f)))
+
+    if (i == 0) {
+      r = v; g = t; b = p
+    } else if (i == 1) {
+      r = q; g = v; b = p
+    } else if (i == 2) {
+      r = p; g = v; b = t
+    } else if (i == 3) {
+      r = p; g = q; b = v
+    } else if (i == 4) {
+      r = t; g = p; b = v
+    } else if (i == 5) {
+      r = v; g = p; b = q
+    }  
+}
+
+function myhsv(i, h, s, v) {
+  hsv2rgb(h, s, v);
+  myrgb(i, r, g, b);
+}
+
+function myrgb(i, r, g, b) {
+  if(i<=298) {
+    c=0.2;
+    rgb(g*c, r*c, b*c);
+  } else if(i<=298+50) {
+    //rgb(r*10, r*10, r*10);
+    rgb(r*1.5, g*1.5, b*1.5);
+  } else {
+    rgb(r, g, b);
+  }
+}

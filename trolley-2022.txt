@@ -216,3 +216,20 @@ function (pixelCount) {
   console.log(output.length) //, JSON.stringify(output))
   return output
 }
+
+/*
+Use with patterns using
+
+
+function myrgb(i, r, g, b) {
+  if(i<=298) {
+    c=0.2;
+    rgb(g*c, r*c, b*c);
+  } else if(i<=298+50) {
+    //rgb(r*10, r*10, r*10);
+    rgb(r*1.5, g*1.5, b*1.5);
+  } else {
+    rgb(r, g, b);
+  }
+}
+*/

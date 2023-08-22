@@ -99,6 +99,33 @@ function (pixelCount) {
     return map;
   }
 
+  function createConeMapUp(xStart, yStart, zEnd, pixelCount) {
+    return createConeMap(xStart, 0, yStart, 0, 0, zEnd, pixelCount);
+  }
+
+  function createConeMapDown(xEnd, yEnd, zStart, pixelCount) {
+    return createConeMap(0, xEnd, 0, yEnd, zStart, 0,pixelCount);
+  }
+
+  function createConeMap(xStart, xEnd, yStart, yEnd, zStart, zEnd, pixelCount) {
+    const map = [];
+    for (var i =0; i < pixelCount; i++) {
+      const x = xStart + (i/(pixelCount-1)) * (xEnd - xStart)
+      const y = yStart + (i/(pixelCount-1)) * (yEnd - yStart)
+      const z = zStart + (i/(pixelCount-1)) * (zEnd - zStart)
+
+      map.push([x,y,z])
+    }
+    return map;
+  }
+
+  function pToX(r, t) {
+    return r * Math.cos(t)
+  }
+  
+  function pToY(r, t) {
+    return r * Math.sin(t)
+  }
 
   //return [[0,100], [201,0], [201,100]]
   //  .concat(createCurveMap(101, 100, 0, 0, 0, 101))
@@ -115,18 +142,49 @@ function (pixelCount) {
   //  6 curves left to right 18*6 ( 0, 15, 30, 45,     47, 62, 77, 92)
   //  straight from right to middle 46
   return []
-    .concat(createCurveMap(18, 15, 0, 0, 0, 18))
-    .concat(createCurveMap(18, 15, 0, 15, 0, 18))
-    .concat(createCurveMap(18, 15, 0, 30, 0, 18))
-    .concat(createHorizontalMap(0, 45, 0, 46))
-    //.concat(createCurveMap(18, 15, 0, 47, 0, 18))
-    //.concat(createCurveMap(18, 15, 0, 62, 0, 18))
-    //.concat(createCurveMap(18, 15, 0, 77, 0, 18))
-    //.concat(createHorizontalMap(0, 91, 46, 46))
-    .concat(createCurveMap(18, 15, 0, 0, 5, 18))
-    .concat(createCurveMap(18, 15, 0, 15, 5, 18))
-    .concat(createCurveMap(18, 15, 0, 30, 5, 18))
-    .concat(createHorizontalMap(5, 45, 0, 46))
+    .concat(createConeMapUp(pToX(1,0),pToY(1,0),2,18))
+    .concat(createConeMapDown(pToX(1,Math.PI/12),pToY(1,Math.PI/12),2,15))
+    .concat(createConeMapUp(pToX(1,2*Math.PI/12),pToY(1,2*Math.PI/12),2,17))
+    .concat(createConeMapDown(pToX(1,3*Math.PI/12),pToY(1,3*Math.PI/12),2,19))
+    .concat(createConeMapUp(pToX(1,4*Math.PI/12),pToY(1,4*Math.PI/12),2,18))
+    .concat(createConeMapDown(pToX(1,5*Math.PI/12),pToY(1,5*Math.PI/12),2,13))
+    .concat(createConeMapUp(pToX(1,6*Math.PI/12),pToY(1,6*Math.PI/12),2,16))
+    .concat(createConeMapDown(pToX(1,7*Math.PI/12),pToY(1,7*Math.PI/12),2,18))
+    .concat(createConeMapUp(pToX(1,8*Math.PI/12),pToY(1,8*Math.PI/12),2,16))
+    .concat(createConeMapDown(pToX(1,9*Math.PI/12),pToY(1,9*Math.PI/12),2,16))
+    .concat(createConeMapUp(pToX(1,10*Math.PI/12),pToY(1,10*Math.PI/12),2,16))
+    .concat(createConeMapDown(pToX(1,11*Math.PI/12),pToY(1,11*Math.PI/12),2,18))
+    // .concat(createCurveMap(18, 15, 0, 0, 0, 18))
+    // .concat(createCurveMap(18, 15, 0, 15, 0, 18))
+    // .concat(createCurveMap(18, 15, 0, 30, 0, 18))
+    // .concat(createHorizontalMap(0, 45, 0, 46))
+    // //.concat(createCurveMap(18, 15, 0, 47, 0, 18))
+    // //.concat(createCurveMap(18, 15, 0, 62, 0, 18))
+    // //.concat(createCurveMap(18, 15, 0, 77, 0, 18))
+    // //.concat(createHorizontalMap(0, 91, 46, 46))
+    // .concat(createCurveMap(18, 15, 0, 0, 5, 18))
+    // .concat(createCurveMap(18, 15, 0, 15, 5, 18))
+    // .concat(createCurveMap(18, 15, 0, 30, 5, 18))
+    // .concat(createHorizontalMap(5, 45, 0, 46))
   
-    //.concat([[100,100]])
-}
+    // //.concat([[100,100]])
+} 
+
+/*
+u 18  18
+d 14  15
+u 16  17
+
+d 19  19
+u 19  18
+d 14  13
+
+u 15  16
+d 17  18
+u 15  16
+
+d 16  16
+u 16  16
+d     18
+
+*/

@@ -1,0 +1,37 @@
+function () {
+  function createLineMap(yStart, yEnd, xStart, xEnd, pixelCount) {
+    const map = [];
+    for (var i =0; i < pixelCount; i++) {
+      const x = xStart + (i/(pixelCount-1)) * (xEnd - xStart)
+      const y = yStart + (i/(pixelCount-1)) * (yEnd - yStart)
+
+      map.push([x,y])
+    }
+    return map;
+  }
+
+return []
+
+
+.concat(createLineMap(0,40,100,90,17)) 
+.concat(createLineMap(40,50,90,60,11)) 
+.concat(createLineMap(50,50,60,40,5)) 
+.concat(createLineMap(50,40,40,10,11)) 
+.concat(createLineMap(40,0,10,0,17)) 
+.concat(createLineMap(0,0,0,10,11)) 
+.concat(createLineMap(0,40,10,10,21)) 
+.concat(createLineMap(40,50,10,40,11)) 
+.concat(createLineMap(50,50,40,60,8)) 
+.concat(createLineMap(50,40,60,90,11)) 
+.concat(createLineMap(40,0,90,90,20)) 
+.concat(createLineMap(0,0,90,95,7)) 
+.concat(createLineMap(0,30,95,92,12)) 
+.concat(createLineMap(30,40,92,90,25)) 
+.concat(createLineMap(40,50,90,60,70)) 
+.concat(createLineMap(50,50,60,40,50)) 
+.concat(createLineMap(50,40,40,10,70)) 
+//.concat(createLineMap(1,10,1,40,200)) 
+//.concat(createLineMap(1,10,1,40,200)) 
+//.concat(createLineMap(1,10,1,40,200)) 
+
+} 
